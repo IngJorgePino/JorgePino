@@ -1,4 +1,7 @@
 # Analisis de datos exploratorios
-# Biometría de peces
-# Jorge Pino
-# jorgepinochoqueapaza@gmail.com
+# Titulo
+Biometría de peces
+# Autor
+Jorge Pino
+# email
+jorgepinochoqueapaza@gmail.com
