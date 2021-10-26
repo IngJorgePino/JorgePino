@@ -1,0 +1,43 @@
+---
+title: "Reporte Analisis de Datos"
+author: "Jorge Pino"
+date: "19/10/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(stats)
+library(graphics)
+library(readxl)
+library(psych)
+library(dplyr)
+library(ggplot2)
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+datos <- read_excel("lenguado.xlsx")
+summary(datos)
+str(datos)
+head(datos)
+```
+```{r}
+read_xlsx("lenguado.xlsx")
+datos$id<- as.factor(datos$id)
+datos$peso<- as.factor(datos$peso)
+```
+```{r}
+table(datos$peso)
+table (datos$talla)
+ggplot(datos, aes(x = weight)) +
+  geom_histogram()
+ggplot(datos, aes(x = weight)) +
+  geom_histogram(aes(color = datos))
+ggplot(datos, aes(x = weight)) +
+  geom_histogram(aes(color = datos), 
+  position = "identity", bins = 30, alpha = 0.4
+
+```
+
+
+
+
