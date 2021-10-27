@@ -15,26 +15,19 @@ library(ggplot2)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 ```{r}
-datos <- read_excel("lenguado.xlsx")
+datos <- read_excel("lenguado2008.xlsx")
 summary(datos)
 str(datos)
 head(datos)
 ```
+
 ```{r}
-read_xlsx("lenguado.xlsx")
-datos$id<- as.factor(datos$id)
-datos$peso<- as.factor(datos$peso)
-```
-```{r}
-table(datos$peso)
-table (datos$talla)
-ggplot(datos, aes(x = weight)) +
+table(datos$Peso)
+table (datos$Talla)
+ggplot(datos, aes(x = Peso)) +
   geom_histogram()
-ggplot(datos, aes(x = weight)) +
+ggplot(datos, aes(x = Talla)) +
   geom_histogram(aes(color = datos))
-ggplot(datos, aes(x = weight)) +
-  geom_histogram(aes(color = datos), 
-  position = "identity", bins = 30, alpha = 0.4
 
 ```
 
