@@ -6,31 +6,42 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 library(stats)
 library(graphics)
 library(readxl)
 library(psych)
 library(dplyr)
 library(ggplot2)
-knitr::opts_chunk$set(echo = TRUE)
 ```
 ```{r}
 datos <- read_excel("lenguado2008.xlsx")
+datos$Pez <- as.factor(datos$Pez)
+datos$Año <- as.factor(datos$Año)
+datos$Mes <- as.factor(datos$Mes)
 summary(datos)
 str(datos)
 head(datos)
 ```
 
 ```{r}
-table(datos$Peso)
-table (datos$Talla)
-ggplot(datos, aes(x = Peso)) +
-  geom_histogram()
-ggplot(datos, aes(x = Talla)) +
-  geom_histogram(aes(color = datos))
-
+# Tablas de frecuencia
+table(datos$Año)
+table(datos$Mes)
 ```
 
 
+```{r}
+ggplot(datos, aes(x = Peso)) +
+  geom_histogram(bins = 30)+ 
+  labs(x="Peso (g)")
+```
 
+# Histograma de Talla
+```{r}
+ggplot(datos, aes(x = Talla)) +
+  geom_histogram(bins = 30)+
+  labs(x="Talla (cm)")
+
+```
 
