@@ -7,7 +7,7 @@ Jorge Pino
 # email
 jorgepinochoqueapaza@gmail.com
 ---
-# Descripcion del problema a resolver
+# Descripción del problema a resolver
 El muestreo biométrico es una técnica que consiste básicamente en tomar las medidas de peso en gramos y longitud total en centímetros, para realizar un seguimiento de la población existente en cada tanque de cultivo. Además, permite observar las condiciones sanitarias de los peces como la presencia o no de ectoparásitos o cualquier anormalidad en el aspecto físico.
 
 # Descripción de los datos
