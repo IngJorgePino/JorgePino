@@ -1,36 +1,37 @@
 ---
-title: "Reporte Analisis de Datos"
+title: "Reporte Analisis de Datos "
 author: "Jorge Pino"
-date: "19/10/2021"
+date: "`r format(Sys.time(), '%d %B %Y')`"
 output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(stats)
-library(graphics)
+knitr::opts_chunk$set(echo = FALSE)
 library(readxl)
-library(psych)
 library(dplyr)
 library(ggplot2)
-```
-```{r}
-datos <- read_excel("lenguado2008.xlsx")
-datos$Pez <- as.factor(datos$Pez)
-datos$Año <- as.factor(datos$Año)
-datos$Mes <- as.factor(datos$Mes)
-summary(datos)
-str(datos)
-head(datos)
+library(knitr)
 ```
 
+# EL CRECIMIENTO EN LENGUADO (Paralichthys adspersus)
+
+El crecimiento, es el cambio de la masa corporal a través del tiempo y es el resultado neto de dos procesos metabolicos con tendencias opuestas. Uno de estos procesos comprende el incremento de masa corporal y se conoce como anabolismo, y el otro proceso se refiere al decremento de la masa corporal como resultado de la degradacion, conocido como catabolismo.
+
 ```{r}
-# Tablas de frecuencia
-table(datos$Año)
+# ....
+lenguado2008 <- read_excel("lenguado2008.xlsx")
+```
+
+
+```{r}
+# Tablas de frecuencia peso por año
+tabla_year <- table(datos$Año)
 table(datos$Mes)
+tabla_year %>% kable(caption = "tabla de frecuencia peso por año")
+
 ```
 
-
+# Histograma de Peso
 ```{r}
 ggplot(datos, aes(x = Peso)) +
   geom_histogram(bins = 30)+ 
@@ -43,5 +44,39 @@ ggplot(datos, aes(x = Talla)) +
   geom_histogram(bins = 30)+
   labs(x="Talla (cm)")
 
+```
+
+# Visualización de la variación de la Talla y Peso con un boxplot
+```{r}
+ggplot(datos, aes(x=Talla, y=Peso)) +
+    geom_point() +
+  labs(x="Talla (cm)", y="Peso (g)")
+  
+```
+```{r}
+lenguado2008$Mes<- as.factor(lenguado2008$Mes)
+# Tablas de frecuencia peso por año
+tabla_Mes <- table(lenguado2008$Mes)
+tabla_Mes %>% kable(caption = "Número de peces por mes")
+summary(lenguado2008)
+```
+
+```{r}
+# Identificar si existen errores, datos faltantes o valores atípicos
+lenguado2008$Talla <- as.numeric(lenguado2008$Talla)
+lenguado2008$Peso <- as.numeric(lenguado2008$Peso)
+ggplot(lenguado2008, aes(x = Mes, y = Talla)) +
+  geom_boxplot()+
+  labs(x="Mes", y="Talla")
+```
+# En el mes 21 se encuentra un dato atipico
+
+```{r}
+# Resume los datos usando tablas y estadística descriptiva
+lenguado2008$Fecha <- as.factor(lenguado2008$Fecha)
+lenguado2008$Año <- as.factor(lenguado2008$Año)
+summary(lenguado2008)
+str(lenguado2008)
+head(lenguado2008)
 ```
 
