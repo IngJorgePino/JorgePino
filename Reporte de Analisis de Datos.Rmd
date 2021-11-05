@@ -5,6 +5,7 @@ date: "`r format(Sys.time(), '%d %B %Y')`"
 output: pdf_document
 ---
 
+# Utilizando librerías para el análisis exploratorio de datos
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 library(readxl)
@@ -22,25 +23,24 @@ El crecimiento, es el cambio de la masa corporal a través del tiempo y es el re
 lenguado2008 <- read_excel("lenguado2008.xlsx")
 ```
 
-
-```{r}
 # Tablas de frecuencia peso por año
-tabla_year <- table(datos$Año)
-table(datos$Mes)
+```{r}
+tabla_year <- table(lenguado2008$Año)
+table(lenguado2008$Mes)
 tabla_year %>% kable(caption = "tabla de frecuencia peso por año")
 
 ```
 
 # Histograma de Peso
 ```{r}
-ggplot(datos, aes(x = Peso)) +
+ggplot(lenguado2008, aes(x = Peso)) +
   geom_histogram(bins = 30)+ 
   labs(x="Peso (g)")
 ```
 
 # Histograma de Talla
 ```{r}
-ggplot(datos, aes(x = Talla)) +
+ggplot(lenguado2008, aes(x = Talla)) +
   geom_histogram(bins = 30)+
   labs(x="Talla (cm)")
 
@@ -48,7 +48,7 @@ ggplot(datos, aes(x = Talla)) +
 
 # Visualización de la variación de la Talla y Peso con un boxplot
 ```{r}
-ggplot(datos, aes(x=Talla, y=Peso)) +
+ggplot(lenguado2008, aes(x=Talla, y=Peso)) +
     geom_point() +
   labs(x="Talla (cm)", y="Peso (g)")
   
@@ -61,18 +61,18 @@ tabla_Mes %>% kable(caption = "Número de peces por mes")
 summary(lenguado2008)
 ```
 
-```{r}
 # Identificar si existen errores, datos faltantes o valores atípicos
+```{r}
 lenguado2008$Talla <- as.numeric(lenguado2008$Talla)
 lenguado2008$Peso <- as.numeric(lenguado2008$Peso)
 ggplot(lenguado2008, aes(x = Mes, y = Talla)) +
   geom_boxplot()+
   labs(x="Mes", y="Talla")
-```
 # En el mes 21 se encuentra un dato atipico
+```
 
-```{r}
 # Resume los datos usando tablas y estadística descriptiva
+```{r}
 lenguado2008$Fecha <- as.factor(lenguado2008$Fecha)
 lenguado2008$Año <- as.factor(lenguado2008$Año)
 summary(lenguado2008)
