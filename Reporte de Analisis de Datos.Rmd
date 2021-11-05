@@ -5,11 +5,16 @@ date: "`r format(Sys.time(), '%d %B %Y')`"
 output: pdf_document
 ---
 
+# Utilizando librerías para el análisis exploratorio de datos
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 library(readxl)
 library(dplyr)
 library(ggplot2)
+library(multcomp)
+library(psych)
+library(car)
+library(lmtest)
 library(knitr)
 ```
 
@@ -22,25 +27,23 @@ El crecimiento, es el cambio de la masa corporal a través del tiempo y es el re
 lenguado2008 <- read_excel("lenguado2008.xlsx")
 ```
 
-
-```{r}
 # Tablas de frecuencia peso por año
-tabla_year <- table(datos$Año)
-table(datos$Mes)
+```{r}
+tabla_year <- table(lenguado2008$Año)
+table(lenguado2008$Mes)
 tabla_year %>% kable(caption = "tabla de frecuencia peso por año")
-
 ```
 
 # Histograma de Peso
 ```{r}
-ggplot(datos, aes(x = Peso)) +
+ggplot(lenguado2008, aes(x = Peso)) +
   geom_histogram(bins = 30)+ 
   labs(x="Peso (g)")
 ```
 
 # Histograma de Talla
 ```{r}
-ggplot(datos, aes(x = Talla)) +
+ggplot(lenguado2008, aes(x = Talla)) +
   geom_histogram(bins = 30)+
   labs(x="Talla (cm)")
 
@@ -48,7 +51,7 @@ ggplot(datos, aes(x = Talla)) +
 
 # Visualización de la variación de la Talla y Peso con un boxplot
 ```{r}
-ggplot(datos, aes(x=Talla, y=Peso)) +
+ggplot(lenguado2008, aes(x=Talla, y=Peso)) +
     geom_point() +
   labs(x="Talla (cm)", y="Peso (g)")
   
@@ -61,22 +64,114 @@ tabla_Mes %>% kable(caption = "Número de peces por mes")
 summary(lenguado2008)
 ```
 
-```{r}
 # Identificar si existen errores, datos faltantes o valores atípicos
+```{r}
 lenguado2008$Talla <- as.numeric(lenguado2008$Talla)
 lenguado2008$Peso <- as.numeric(lenguado2008$Peso)
 ggplot(lenguado2008, aes(x = Mes, y = Talla)) +
   geom_boxplot()+
   labs(x="Mes", y="Talla")
-```
 # En el mes 21 se encuentra un dato atipico
+```
 
-```{r}
 # Resume los datos usando tablas y estadística descriptiva
+```{r}
 lenguado2008$Fecha <- as.factor(lenguado2008$Fecha)
 lenguado2008$Año <- as.factor(lenguado2008$Año)
 summary(lenguado2008)
 str(lenguado2008)
 head(lenguado2008)
+```
+
+# Comparacion de regresion lineal y no lineal
+```{r}
+# Moldelo 1. Regresion lineal simple
+model1 <- lm(Peso~Talla,data = lenguado2008)
+summary(model1)$coef %>% kable()
+
+```
+
+
+```{r, out.width = '75%', message=FALSE, fig.align='center'}
+My_Theme = theme(
+  axis.title.x = element_text(size = 20),
+  axis.text.x = element_text(size = 20),
+  axis.title.y = element_text(size = 20),
+  axis.text.y = element_text(size = 20))
+plotmod1 <- ggplot(data = lenguado2008, aes(x = Talla, y = Peso)) +
+  geom_point(position = position_jitter(w = 0, h = 0.1) ) +
+  labs(x = "Talla (cm)", y = "Peso (g)") +
+  scale_shape_manual(values=c(1,2)) +
+ geom_smooth(method = "lm", formula = y ~ poly(x, 1), color = "blue") +
+  scale_color_brewer(palette="Set1") + 
+  theme(legend.position="none") +
+  theme(panel.border=element_blank(), axis.line=element_line())
+plotmod1+My_Theme
+```
+
+```{r}
+# Moldelo 2. Regresion No lineal
+model2 <- lm(Peso~poly(Talla,2),data = lenguado2008)
+summary(model2)$coef %>% kable()
+
+```
+
+```{r, out.width = '75%', message=FALSE, fig.align='center'}
+My_Theme = theme(
+  axis.title.x = element_text(size = 20),
+  axis.text.x = element_text(size = 20),
+  axis.title.y = element_text(size = 20),
+  axis.text.y = element_text(size = 20))
+plotmod2 <- ggplot(data = lenguado2008, aes(x = Talla, y = Peso)) +
+  geom_point(position = position_jitter(w = 0, h = 0.1) ) +
+  labs(x = "Talla (cm)", y = "Peso (g)") +
+  scale_shape_manual(values=c(1,2)) +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2), color = "red") +
+  scale_color_brewer(palette="Set1") + 
+  theme(legend.position="none") +
+  theme(panel.border=element_blank(), axis.line=element_line())
+plotmod2+My_Theme
+```
+```{r}
+anova(model1,model2)%>% kable()
+```
+
+```{r}
+AIC(model1, model2)%>% kable()
+```
+# Evaluando los supuestos de los modelos 1 y 2
+
+```{r}
+lm.aov <- lm(Peso ~ Talla, data = lenguado2008)
+aov(lm.aov)
+```
+
+
+```{r}
+plot(lm.aov$residuals, pch=20, col = "blue")
+```
+```{r}
+dwtest(Peso ~ Talla, data = lenguado2008,
+       alternative = c("two.sided"), 
+       iterations = 15)
+```
+
+```{r}
+plot(lm.aov, 1, pch=20, col = "blue")
+```
+```{r}
+leveneTest(Peso ~ Talla, data = tilapia_cepas,
+           center = "median")
+```
+
+```{r}
+plot(lm.aov, 2, pch=20, col = "blue")
+```
+```{r}
+aov_residuals <- residuals(object = lm.aov)
+hist(x= aov_residuals, main = "Histograma de residuales")
+```
+```{r}
+shapiro.test(x= aov_residuals)
 ```
 
