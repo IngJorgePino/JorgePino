@@ -22,6 +22,8 @@ library(knitr)
 
 El crecimiento, es el cambio de la masa corporal a través del tiempo y es el resultado neto de dos procesos metabolicos con tendencias opuestas. Uno de estos procesos comprende el incremento de masa corporal y se conoce como anabolismo, y el otro proceso se refiere al decremento de la masa corporal como resultado de la degradacion, conocido como catabolismo.
 
+# Objetivo
+Determinar el modelo estadistico que se ajusta para el crecimiento de Paralichthys adspersus "lenguado fino". 
 ```{r}
 # ....
 lenguado2008 <- read_excel("lenguado2008.xlsx")
@@ -71,8 +73,8 @@ lenguado2008$Peso <- as.numeric(lenguado2008$Peso)
 ggplot(lenguado2008, aes(x = Mes, y = Talla)) +
   geom_boxplot()+
   labs(x="Mes", y="Talla")
-# En el mes 21 se encuentra un dato atipico
 ```
+# La talla en el mes 21 presenta un dato atipico
 
 # Resume los datos usando tablas y estadística descriptiva
 ```{r}
@@ -82,6 +84,43 @@ summary(lenguado2008)
 str(lenguado2008)
 head(lenguado2008)
 ```
+```{r}
+tabla_Day<- lenguado2008%>%
+  group_by(Mes)%>%
+  summarise(mean=mean(Talla),sd=sd(Talla), var=var(Talla),max=max(Talla),min=min(Talla), n=n())
+knitr::kable(tabla_Day,caption = "Estadistico descriptivo de la talla del lenguado")
+```
+# Evaluando los supuestos de los modelos 1 y 2
+
+```{r}
+lm.aov <- lm(Peso ~ Talla, data = lenguado2008)
+aov(lm.aov)
+```
+
+
+```{r}
+plot(lm.aov$residuals, pch=20, col = "blue")
+```
+```{r}
+dwtest(Peso ~ Talla, data = lenguado2008,
+       alternative = c("two.sided"), 
+       iterations = 15)
+```
+
+```{r}
+plot(lm.aov, 1, pch=20, col = "blue")
+```
+```{r}
+plot(lm.aov, 2, pch=20, col = "blue")
+```
+```{r}
+aov_residuals <- residuals(object = lm.aov)
+hist(x= aov_residuals, main = "Histograma de residuales")
+```
+```{r}
+shapiro.test(x= aov_residuals)
+```
+## Comentario: Segun la prueba de Normalidad de Shapiro_Wilk, los datos de crecimiento no presentan una Distribucion Normal
 
 # Comparacion de regresion lineal y no lineal
 ```{r}
@@ -108,7 +147,7 @@ plotmod1 <- ggplot(data = lenguado2008, aes(x = Talla, y = Peso)) +
   theme(panel.border=element_blank(), axis.line=element_line())
 plotmod1+My_Theme
 ```
-
+# Comentario: Segun la figura los datos no interceptan con la pendiente, por lo tanto, no presentan un modelo lineal
 ```{r}
 # Moldelo 2. Regresion No lineal
 model2 <- lm(Peso~poly(Talla,2),data = lenguado2008)
@@ -132,6 +171,8 @@ plotmod2 <- ggplot(data = lenguado2008, aes(x = Talla, y = Peso)) +
   theme(panel.border=element_blank(), axis.line=element_line())
 plotmod2+My_Theme
 ```
+# Comentario: Segun la figura la mayoría de los datos interceptan con la pendiente, por lo tanto, presentan un modelo no lineal
+
 ```{r}
 anova(model1,model2)%>% kable()
 ```
@@ -139,39 +180,6 @@ anova(model1,model2)%>% kable()
 ```{r}
 AIC(model1, model2)%>% kable()
 ```
-# Evaluando los supuestos de los modelos 1 y 2
+# Conclusión
 
-```{r}
-lm.aov <- lm(Peso ~ Talla, data = lenguado2008)
-aov(lm.aov)
-```
-
-
-```{r}
-plot(lm.aov$residuals, pch=20, col = "blue")
-```
-```{r}
-dwtest(Peso ~ Talla, data = lenguado2008,
-       alternative = c("two.sided"), 
-       iterations = 15)
-```
-
-```{r}
-plot(lm.aov, 1, pch=20, col = "blue")
-```
-```{r}
-leveneTest(Peso ~ Talla, data = tilapia_cepas,
-           center = "median")
-```
-
-```{r}
-plot(lm.aov, 2, pch=20, col = "blue")
-```
-```{r}
-aov_residuals <- residuals(object = lm.aov)
-hist(x= aov_residuals, main = "Histograma de residuales")
-```
-```{r}
-shapiro.test(x= aov_residuals)
-```
-
+El crecimiento de juveniles de *Paralichthys adspersus* "lenguado fino" se ajusta un modelo estadistico No lineal.
